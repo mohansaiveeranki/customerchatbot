@@ -1,6 +1,13 @@
 import os
 import asyncio
+import mimetypes
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
+
+# Explicitly register MIME types to fix 'application/octet-stream' errors in some environments
+mimetypes.init()
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("text/css", ".css")
+
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Dict

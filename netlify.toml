@@ -1,0 +1,15 @@
+[build]
+  # Tell Netlify to navigate to the frontend folder
+  base = "frontend"
+  
+  # The output directory after running npm run build (relative to the base directory)
+  publish = "dist"
+  
+  # Build command to compile our React Vite application
+  command = "npm run build"
+
+# SPA redirection rules so reloading routes like /tickets or /chat doesn't return a 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
