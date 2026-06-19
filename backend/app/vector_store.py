@@ -20,6 +20,10 @@ class FileRAGPipeline:
         self.index = None
         self.model = None
         self.data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
+        if not os.path.exists(self.data_dir):
+            fallback_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+            if os.path.exists(fallback_dir):
+                self.data_dir = fallback_dir
         
         if USE_SEMANTIC:
             try:

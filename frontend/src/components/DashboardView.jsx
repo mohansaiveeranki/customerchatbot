@@ -5,6 +5,7 @@ import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
 import StarIcon from '@mui/icons-material/Star'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { getApiUrl } from '../config'
 
 export default function DashboardView() {
   const [stats, setStats] = useState(null)
@@ -13,7 +14,7 @@ export default function DashboardView() {
   const fetchStats = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/dashboard')
+      const response = await fetch(getApiUrl('/api/dashboard'))
       if (response.ok) {
         const data = await response.json()
         setStats(data)

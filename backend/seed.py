@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 from app.database import SessionLocal, Base, engine
 from app.models import Ticket, Message, KBArticle
 
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-def seed_database():
+def seed_database(drop_tables=False):
+    if drop_tables:
+        Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         articles = [
@@ -132,4 +132,4 @@ def seed_database():
         db.close()
 
 if __name__ == "__main__":
-    seed_database()
+    seed_database(drop_tables=True)

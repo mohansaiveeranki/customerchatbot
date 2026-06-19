@@ -7,6 +7,7 @@ import DnsIcon from '@mui/icons-material/Dns'
 import InfoIcon from '@mui/icons-material/Info'
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { getApiUrl, getWsUrl } from '../config'
 
 export default function ChatView() {
   const [sessions, setSessions] = useState([])
@@ -20,7 +21,7 @@ export default function ChatView() {
   const fetchChats = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/chat')
+      const response = await fetch(getApiUrl('/api/chat'))
       if (response.ok) {
         const data = await response.json()
         setSessions(data)
@@ -50,7 +51,7 @@ export default function ChatView() {
 
   useEffect(() => {
     if (!selectedSession) return
-    const wsUrl = `ws://${window.location.host}/ws/chat/${selectedSession.id}`
+    const wsUrl = getWsUrl(`/ws/chat/${selectedSession.id}`)
     socketRef.current = new WebSocket(wsUrl)
 
     socketRef.current.onmessage = (event) => {

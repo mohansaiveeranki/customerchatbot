@@ -4,6 +4,7 @@ import SendIcon from '@mui/icons-material/Send'
 import EmailIcon from '@mui/icons-material/Email'
 import BusinessIcon from '@mui/icons-material/Business'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { getApiUrl } from '../config'
 
 export default function TicketsView() {
   const [tickets, setTickets] = useState([])
@@ -17,7 +18,7 @@ export default function TicketsView() {
   const fetchTickets = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/tickets')
+      const response = await fetch(getApiUrl('/api/tickets'))
       if (response.ok) {
         const data = await response.json()
         setTickets(data)
@@ -58,7 +59,7 @@ export default function TicketsView() {
 
   const handleStatusChange = async (ticketId, newStatus) => {
     try {
-      const response = await fetch(`/api/tickets/${ticketId}`, {
+      const response = await fetch(getApiUrl(`/api/tickets/${ticketId}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -90,7 +91,7 @@ export default function TicketsView() {
     setReplyText('')
 
     try {
-      const response = await fetch(`/api/tickets/${selectedTicket.id}/messages`, {
+      const response = await fetch(getApiUrl(`/api/tickets/${selectedTicket.id}/messages`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sender: 'agent', content: text })

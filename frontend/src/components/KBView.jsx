@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
 import BookIcon from '@mui/icons-material/Book'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { getApiUrl } from '../config'
 
 export default function KBView() {
   const [articles, setArticles] = useState([])
@@ -14,7 +15,7 @@ export default function KBView() {
   const fetchArticles = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/kb')
+      const response = await fetch(getApiUrl('/api/kb'))
       if (response.ok) {
         const data = await response.json()
         setArticles(data)

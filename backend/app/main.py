@@ -31,6 +31,20 @@ def startup_event():
     db = next(get_db())
     try:
         articles = db.query(KBArticle).all()
+        if not articles:
+            print("Database is empty. Running auto-seeding...")
+            try:
+                import sys
+                backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                if backend_dir not in sys.path:
+                    sys.path.append(backend_dir)
+                from seed import seed_database
+                seed_database(drop_tables=False)
+                articles = db.query(KBArticle).all()
+                print("Database auto-seeding completed.")
+            except Exception as e:
+                print(f"Error seeding database on startup: {e}")
+                
         articles_list = [
             {"id": a.id, "title": a.title, "summary": a.summary, "content": a.content, "category": a.category}
             for a in articles
@@ -332,3 +346,35 @@ async def websocket_endpoint(websocket: WebSocket, chat_id: str):
                 await manager.broadcast(chat_id, reply_payload)
     except WebSocketDisconnect:
         manager.disconnect(chat_id, websocket)
+
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+# Check for frontend/dist at ../../frontend/dist (if we are in backend/app)
+frontend_dist_path = os.path.abspath(os.path.join(current_file_dir, "..", "..", "frontend", "dist"))
+
+if not os.path.exists(frontend_dist_path):
+    # Try relative to backend dir if backend is the root of deployment
+    frontend_dist_path = os.path.abspath(os.path.join(current_file_dir, "..", "frontend", "dist"))
+
+if os.path.exists(frontend_dist_path):
+    print(f"Serving frontend static files from: {frontend_dist_path}")
+    
+    # Mount assets folder
+    assets_dir = os.path.join(frontend_dist_path, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        
+    @app.get("/{catchall:path}")
+    def serve_frontend_app(catchall: str):
+        # Allow requests to go through to api and ws
+        if catchall.startswith("api") or catchall.startswith("ws"):
+            raise HTTPException(status_code=404, detail="Not Found")
+            
+        index_file = os.path.join(frontend_dist_path, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"message": "Frontend build files exist, but index.html was not found."}
+else:
+    print("Frontend build directory not found. Serving API only.")
